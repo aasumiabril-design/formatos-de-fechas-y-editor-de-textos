@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDITOR DE FECHAS Y TEXTOS</title>
+    <title>Editor De Fechas y Textos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -73,7 +73,7 @@
     <aside class="sidebar w-full md:w-64 flex flex-col border-b md:border-b-0 md:border-r border-gray-800 shrink-0">
         <div class="p-4 md:p-8 text-center flex md:flex-col items-center justify-between md:justify-start">
             <div>
-                <h1 class="text-xl md:text-2xl font-bold accent-cyan tracking-tighter">FECHAS Y TEXTOS</h1>
+                <h1 class="text-xl md:text-2xl font-bold accent-cyan tracking-tighter">TEXTDATE</h1>
                 <p class="hidden md:block text-xs text-gray-500 mt-1">EDITOR</p>
             </div>
             <div id="status-label" class="text-emerald-500 font-bold text-xs md:text-sm md:mt-4 h-6"></div>
@@ -224,9 +224,7 @@
                 'mil': 1000, 'millon': 1000000
             };
             
-            // Limpieza básica y normalización
             let cleanStr = str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            // Re-mapear el diccionario para ignorar tildes en la búsqueda
             const normalizedDict = {};
             for (let key in dict) {
                 let normalizedKey = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -301,36 +299,28 @@
             
             if (manual) {
                 const manualLower = manual.toLowerCase();
-                
-                // 1. Identificar el mes
                 let mesIndex = -1;
                 MESES.forEach((mes, i) => {
                     if (manualLower.includes(mes)) mesIndex = i;
                 });
 
-                // 2. Extraer candidatos numéricos o textuales para Día y Año
                 const fragments = manualLower.split(/\bde\b/);
-                
                 let dia = null;
                 let año = null;
 
                 if (mesIndex !== -1 && fragments.length >= 2) {
                     let diaFragment = fragments[0].trim();
                     let añoFragment = fragments[fragments.length - 1].trim();
-
-                    // Intentar extraer número del fragmento de día
                     let diaNumMatch = diaFragment.match(/\d+/);
                     dia = diaNumMatch ? parseInt(diaNumMatch[0]) : palabrasANumero(diaFragment);
-
-                    // Intentar extraer número del fragmento de año
                     let añoNumMatch = añoFragment.match(/\d+/);
                     año = añoNumMatch ? parseInt(añoNumMatch[0]) : palabrasANumero(añoFragment);
                 } else {
                     const nums = manual.match(/\d+/g);
                     if (nums && nums.length >= 3) {
-                        if (nums[0].length === 4) { // ISO
+                        if (nums[0].length === 4) {
                             año = parseInt(nums[0]); mesIndex = parseInt(nums[1]) - 1; dia = parseInt(nums[2]);
-                        } else { // Estandar
+                        } else {
                             dia = parseInt(nums[0]); mesIndex = parseInt(nums[1]) - 1; año = parseInt(nums[2]);
                         }
                     }
@@ -342,7 +332,6 @@
                 }
             } 
             
-            // PRIORIDAD 2: Calendario (si manual falló o no existe)
             if ((!dt || isNaN(dt.getTime())) && calVal) {
                 const parts = calVal.split('-');
                 dt = new Date(parts[0], parts[1]-1, parts[2]);
@@ -415,7 +404,9 @@
             if (m === 'up') updateOut(t.toUpperCase());
             else if (m === 'low') updateOut(t.toLowerCase());
             else {
-                updateOut(t.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase()));
+                // Modo Nombre Propio: Primera letra de CADA palabra en mayúscula
+                // Detecta palabras por límites de palabra (\b) o caracteres que no sean letras
+                updateOut(t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()));
             }
         }
 
