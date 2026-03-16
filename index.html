@@ -14,7 +14,14 @@
             background-color: #0B0F19;
             color: #F9FAFB;
             height: 100vh;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+            }
         }
 
         .sidebar { background-color: #111827; }
@@ -38,10 +45,18 @@
         .btn-nav.active {
             background-color: #1F2937;
             color: #22D3EE;
+            border-bottom: 2px solid #22D3EE;
+        }
+        
+        @media (min-width: 768px) {
+            .btn-nav.active {
+                border-bottom: none;
+                border-left: 4px solid #22D3EE;
+            }
         }
 
         .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #111827;
@@ -52,74 +67,76 @@
         }
     </style>
 </head>
-<body class="flex">
+<body class="flex flex-col md:flex-row">
 
-    <!-- Sidebar -->
-    <aside class="sidebar w-64 flex flex-col border-r border-gray-800">
-        <div class="p-8 text-center">
-            <h1 class="text-2xl font-bold accent-cyan tracking-tighter">DATAMORPH</h1>
-            <p class="text-xs text-gray-500 mt-1">ELITE v9.0</p>
+    <!-- Sidebar / Top Nav on Mobile -->
+    <aside class="sidebar w-full md:w-64 flex flex-col border-b md:border-b-0 md:border-r border-gray-800 shrink-0">
+        <div class="p-4 md:p-8 text-center flex md:flex-col items-center justify-between md:justify-start">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold accent-cyan tracking-tighter">DATAMORPH</h1>
+                <p class="hidden md:block text-xs text-gray-500 mt-1">ELITE v9.0</p>
+            </div>
+            <!-- Status Label for Mobile -->
+            <div id="status-label" class="text-emerald-500 font-bold text-xs md:text-sm md:mt-4 h-6"></div>
         </div>
 
-        <nav class="flex-1 px-4 space-y-2">
-            <button onclick="showView('fechas')" id="btn-fechas" class="btn-nav active w-full flex items-center p-3 rounded-lg text-sm font-bold transition-all">
-                <i class="fa-solid fa-calendar-days mr-3"></i> MÓDULO FECHAS
+        <nav class="flex md:flex-col flex-1 px-2 md:px-4 pb-2 md:pb-0 space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto">
+            <button onclick="showView('fechas')" id="btn-fechas" class="btn-nav active whitespace-nowrap flex-1 md:flex-none flex items-center justify-center md:justify-start p-3 rounded-lg text-xs md:text-sm font-bold transition-all">
+                <i class="fa-solid fa-calendar-days md:mr-3"></i> <span class="ml-2 md:ml-0">MÓDULO FECHAS</span>
             </button>
-            <button onclick="showView('texto')" id="btn-texto" class="btn-nav w-full flex items-center p-3 text-gray-400 rounded-lg text-sm font-bold hover:bg-gray-800 transition-all">
-                <i class="fa-solid fa-file-lines mr-3"></i> PROCESADOR TEXTO
+            <button onclick="showView('texto')" id="btn-texto" class="btn-nav whitespace-nowrap flex-1 md:flex-none flex items-center justify-center md:justify-start p-3 text-gray-400 rounded-lg text-xs md:text-sm font-bold hover:bg-gray-800 transition-all">
+                <i class="fa-solid fa-file-lines md:mr-3"></i> <span class="ml-2 md:ml-0">PROCESADOR TEXTO</span>
             </button>
         </nav>
-
-        <div id="status-label" class="p-6 text-center text-emerald-500 font-bold text-sm h-12"></div>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 overflow-y-auto custom-scrollbar">
-        <div class="main-container h-full rounded-3xl p-8 shadow-2xl overflow-y-auto">
+    <main class="flex-1 p-3 md:p-6 overflow-y-auto custom-scrollbar bg-[#0B0F19]">
+        <div class="main-container min-h-full rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl">
             
             <!-- VIEW: FECHAS -->
             <div id="view-fechas">
-                <h2 class="text-3xl font-bold mb-6 text-center">Gestor Avanzado de Fechas</h2>
+                <h2 class="text-xl md:text-3xl font-bold mb-6 text-center">Gestor Avanzado de Fechas</h2>
                 
-                <div class="card rounded-2xl p-6 mb-8 shadow-lg">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="card rounded-2xl p-4 md:p-6 mb-8 shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">Calendario:</label>
-                            <input type="date" id="input-date" class="w-full p-3 rounded-lg">
+                            <label class="block text-xs md:text-sm text-gray-400 mb-2">Calendario:</label>
+                            <input type="date" id="input-date" class="w-full p-3 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">Pegar Texto/Fecha:</label>
-                            <input type="text" id="input-manual" placeholder="Ej: 24/07/2021..." class="w-full p-3 rounded-lg">
+                            <label class="block text-xs md:text-sm text-gray-400 mb-2">Pegar Texto/Fecha:</label>
+                            <input type="text" id="input-manual" placeholder="Ej: 24/07/2021..." class="w-full p-3 rounded-lg text-sm">
                         </div>
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-sm text-gray-400 mb-2">Seleccione Formato:</label>
-                        <select id="select-format" class="w-full p-3 rounded-lg appearance-none cursor-pointer">
-                            <option value="notarial">Notarial (Letras con Números en Paréntesis)</option>
-                            <option value="largo">Largo (Veinticuatro de Julio de Dos Mil...)</option>
-                            <option value="dia_fecha">Día y Fecha (Sábado, 24 de Julio...)</option>
-                            <option value="administrativo">Administrativo (24-JUL-2021)</option>
-                            <option value="estandar">Estándar (24/07/2021)</option>
-                            <option value="iso">Técnico ISO (2021-07-24)</option>
-                            <option value="mes_ano">Solo Mes y Año (Julio de 2021)</option>
+                        <label class="block text-xs md:text-sm text-gray-400 mb-2">Seleccione Formato:</label>
+                        <select id="select-format" class="w-full p-3 rounded-lg appearance-none cursor-pointer text-sm">
+                            <option value="notarial">Notarial (Letras con Números)</option>
+                            <option value="largo">Largo (Texto completo)</option>
+                            <option value="dia_fecha">Día y Fecha</option>
+                            <option value="administrativo">Administrativo (DD-MMM-AAAA)</option>
+                            <option value="estandar">Estándar (DD/MM/AAAA)</option>
+                            <option value="iso">Técnico ISO (AAAA-MM-DD)</option>
+                            <option value="mes_ano">Solo Mes y Año</option>
                         </select>
                     </div>
 
-                    <div class="flex justify-center space-x-2 mb-8">
-                        <button onclick="setCaseMode('low')" class="case-btn px-4 py-2 rounded-md bg-gray-800 border border-gray-600 text-sm">minúsculas</button>
-                        <button onclick="setCaseMode('up')" class="case-btn px-4 py-2 rounded-md bg-gray-800 border border-gray-600 text-sm">MAYÚSCULAS</button>
-                        <button onclick="setCaseMode('title')" class="case-btn px-4 py-2 rounded-md bg-cyan-custom text-sm font-bold">Nombre Propio</button>
+                    <div class="flex flex-wrap justify-center gap-2 mb-8">
+                        <button onclick="setCaseMode('low')" class="case-btn flex-1 md:flex-none px-3 py-2 rounded-md bg-gray-800 border border-gray-600 text-[10px] md:text-xs">minúsculas</button>
+                        <button onclick="setCaseMode('up')" class="case-btn flex-1 md:flex-none px-3 py-2 rounded-md bg-gray-800 border border-gray-600 text-[10px] md:text-xs">MAYÚSCULAS</button>
+                        <button onclick="setCaseMode('title')" class="case-btn flex-1 md:flex-none px-3 py-2 rounded-md bg-cyan-custom text-[10px] md:text-xs font-bold">Nombre Propio</button>
                     </div>
 
-                    <button onclick="procesarFecha()" class="w-full bg-cyan-custom text-white font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-95">
+                    <button onclick="procesarFecha()" class="w-full bg-cyan-custom text-white font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-95 text-sm">
                         GENERAR FECHA
                     </button>
                 </div>
 
                 <div class="relative">
-                    <textarea id="result-fecha" readonly class="w-full h-32 rounded-2xl bg-gray-900 border-2 border-cyan-400 text-cyan-400 p-4 text-center text-2xl font-bold flex items-center justify-center resize-none"></textarea>
-                    <button onclick="copyToClipboard('result-fecha')" class="mt-4 mx-auto block bg-emerald-500 hover:bg-emerald-600 px-8 py-3 rounded-lg font-bold text-sm">
+                    <textarea id="result-fecha" readonly class="w-full h-32 md:h-40 rounded-2xl bg-gray-900 border-2 border-cyan-400 text-cyan-400 p-4 text-center text-lg md:text-2xl font-bold flex items-center justify-center resize-none"></textarea>
+                    <button onclick="copyToClipboard('result-fecha')" class="mt-4 mx-auto block bg-emerald-500 hover:bg-emerald-600 px-8 py-3 rounded-lg font-bold text-sm w-full md:w-auto">
                         COPIAR RESULTADO
                     </button>
                 </div>
@@ -127,27 +144,33 @@
 
             <!-- VIEW: TEXTO -->
             <div id="view-texto" class="hidden h-full flex flex-col">
-                <h2 class="text-3xl font-bold mb-6 text-center">Procesador Inteligente de Texto</h2>
+                <h2 class="text-xl md:text-3xl font-bold mb-6 text-center">Procesador Inteligente de Texto</h2>
                 
-                <div class="flex flex-1 gap-4 mb-6 min-h-[300px]">
-                    <textarea id="text-in" placeholder="Pegue su texto aquí..." class="flex-1 rounded-xl p-4 font-mono text-sm resize-none"></textarea>
-                    <textarea id="text-out" readonly placeholder="Resultado..." class="flex-1 rounded-xl p-4 font-mono text-sm text-cyan-400 bg-black/30 border-gray-700 resize-none"></textarea>
+                <div class="flex flex-col md:flex-row flex-1 gap-4 mb-6 min-h-[400px]">
+                    <div class="flex-1 flex flex-col">
+                        <span class="text-[10px] uppercase text-gray-500 mb-1 ml-1">Entrada</span>
+                        <textarea id="text-in" placeholder="Pegue su texto aquí..." class="flex-1 rounded-xl p-4 font-mono text-xs md:text-sm resize-none"></textarea>
+                    </div>
+                    <div class="flex-1 flex flex-col">
+                        <span class="text-[10px] uppercase text-gray-500 mb-1 ml-1">Salida</span>
+                        <textarea id="text-out" readonly placeholder="Resultado..." class="flex-1 rounded-xl p-4 font-mono text-xs md:text-sm text-cyan-400 bg-black/30 border-gray-700 resize-none"></textarea>
+                    </div>
                 </div>
 
-                <div class="card rounded-2xl p-6">
-                    <div class="flex flex-wrap gap-4 mb-4">
-                        <input type="text" id="search-input" placeholder="Buscar..." class="flex-1 p-2 rounded-lg text-sm">
-                        <input type="text" id="replace-input" placeholder="Reemplazar por..." class="flex-1 p-2 rounded-lg text-sm">
-                        <button onclick="ejecutarReemplazo()" class="bg-cyan-700 hover:bg-cyan-600 px-4 py-2 rounded-lg text-xs font-bold">CAMBIAR TODO</button>
-                        <button onclick="borrarBusqueda()" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-xs font-bold">BORRAR</button>
+                <div class="card rounded-2xl p-4 md:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-nowrap gap-2 mb-4">
+                        <input type="text" id="search-input" placeholder="Buscar..." class="p-2 rounded-lg text-sm w-full">
+                        <input type="text" id="replace-input" placeholder="Reemplazar por..." class="p-2 rounded-lg text-sm w-full">
+                        <button onclick="ejecutarReemplazo()" class="bg-cyan-700 hover:bg-cyan-600 px-4 py-2 rounded-lg text-[10px] font-bold">CAMBIAR TODO</button>
+                        <button onclick="borrarBusqueda()" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-[10px] font-bold">BORRAR</button>
                     </div>
                     
                     <div class="flex flex-wrap gap-2 justify-center">
-                        <button onclick="modTxt('low')" class="bg-gray-700 px-4 py-2 rounded-lg text-xs">minúsculas</button>
-                        <button onclick="modTxt('up')" class="bg-gray-700 px-4 py-2 rounded-lg text-xs">MAYÚSCULAS</button>
-                        <button onclick="modTxt('title')" class="bg-emerald-600 px-4 py-2 rounded-lg text-xs font-bold">Nombre Propio</button>
-                        <button onclick="quitarSaltos()" class="bg-gray-600 px-4 py-2 rounded-lg text-xs">Quitar Saltos</button>
-                        <button onclick="copyToClipboard('text-out')" class="bg-cyan-500 px-4 py-2 rounded-lg text-xs font-bold">COPIAR TODO</button>
+                        <button onclick="modTxt('low')" class="flex-1 md:flex-none bg-gray-700 px-3 py-2 rounded-lg text-[10px]">minúsculas</button>
+                        <button onclick="modTxt('up')" class="flex-1 md:flex-none bg-gray-700 px-3 py-2 rounded-lg text-[10px]">MAYÚSCULAS</button>
+                        <button onclick="modTxt('title')" class="flex-1 md:flex-none bg-emerald-600 px-3 py-2 rounded-lg text-[10px] font-bold">Nombre Propio</button>
+                        <button onclick="quitarSaltos()" class="flex-1 md:flex-none bg-gray-600 px-3 py-2 rounded-lg text-[10px]">Quitar Saltos</button>
+                        <button onclick="copyToClipboard('text-out')" class="w-full md:w-auto bg-cyan-500 px-4 py-2 rounded-lg text-[10px] font-bold">COPIAR TODO</button>
                     </div>
                 </div>
             </div>
@@ -174,15 +197,24 @@
             
             document.getElementById('btn-texto').classList.toggle('active', view === 'texto');
             document.getElementById('btn-texto').classList.toggle('text-gray-400', view !== 'texto');
+            
+            // Auto scroll to top on mobile when switching views
+            if (window.innerWidth < 768) {
+                document.querySelector('main').scrollTop = 0;
+            }
         }
 
         function setCaseMode(mode) {
             currentCaseMode = mode;
             document.querySelectorAll('.case-btn').forEach(btn => {
-                const isSelected = btn.innerText.toLowerCase().includes(mode === 'low' ? 'min' : mode === 'up' ? 'may' : 'propio');
+                const text = btn.innerText.toLowerCase();
+                const isSelected = (mode === 'low' && text.includes('min')) || 
+                                 (mode === 'up' && text.includes('may')) || 
+                                 (mode === 'title' && text.includes('propio'));
+                
                 btn.className = isSelected 
-                    ? "case-btn px-4 py-2 rounded-md bg-cyan-custom text-sm font-bold" 
-                    : "case-btn px-4 py-2 rounded-md bg-gray-800 border border-gray-600 text-sm";
+                    ? "case-btn flex-1 md:flex-none px-3 py-2 rounded-md bg-cyan-custom text-[10px] md:text-xs font-bold" 
+                    : "case-btn flex-1 md:flex-none px-3 py-2 rounded-md bg-gray-800 border border-gray-600 text-[10px] md:text-xs";
             });
         }
 
@@ -207,7 +239,7 @@
             if (num < 1000) {
                 let c = Math.floor(num / 100);
                 let resto = num % 100;
-                return centenas[c] + (resto > 0 ? " " + numeroALetras(resto) : "");
+                return (c === 1 && resto === 0) ? "cien" : centenas[c] + (resto > 0 ? " " + numeroALetras(resto) : "");
             }
 
             if (num < 1000000) {
@@ -223,7 +255,6 @@
             if (currentCaseMode === 'up') return str.toUpperCase();
             if (currentCaseMode === 'low') return str.toLowerCase();
             
-            // Lógica para Nombre Propio (Title case inteligente)
             return str.toLowerCase().split(' ').map(word => {
                 if (['de', 'del', 'y', 'en'].includes(word)) return word;
                 return word.charAt(0).toUpperCase() + word.slice(1);
@@ -242,7 +273,6 @@
                     let a = parseInt(nums[nums.length - 1]);
                     if (a < 100) a += 2000;
                     
-                    // Intentar encontrar el mes por nombre
                     let m = document.getElementById('input-date').valueAsDate.getMonth();
                     MESES.forEach((mes, i) => {
                         if (manual.toLowerCase().includes(mes)) m = i;
@@ -260,7 +290,6 @@
                 return;
             }
 
-            // Ajustar zona horaria local
             dt = new Date(dt.getTime() + dt.getTimezoneOffset() * 60000);
 
             const d = dt.getDate();
@@ -346,7 +375,7 @@
         function showStatus(msg, isError = false) {
             const label = document.getElementById('status-label');
             label.innerText = msg;
-            label.className = isError ? "p-6 text-center text-red-500 font-bold text-sm h-12" : "p-6 text-center text-emerald-500 font-bold text-sm h-12";
+            label.className = isError ? "text-red-500 font-bold text-xs md:text-sm h-6" : "text-emerald-500 font-bold text-xs md:text-sm h-6";
             setTimeout(() => label.innerText = "", 2000);
         }
     </script>
