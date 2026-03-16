@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FechaText Editor | Ultimate</title>
+    <title>EDITOR DE FECHAS Y TEXTOS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -73,10 +73,9 @@
     <aside class="sidebar w-full md:w-64 flex flex-col border-b md:border-b-0 md:border-r border-gray-800 shrink-0">
         <div class="p-4 md:p-8 text-center flex md:flex-col items-center justify-between md:justify-start">
             <div>
-                <h1 class="text-xl md:text-2xl font-bold accent-cyan tracking-tighter">FECHATEXT</h1>
+                <h1 class="text-xl md:text-2xl font-bold accent-cyan tracking-tighter">FECHAS Y TEXTOS</h1>
                 <p class="hidden md:block text-xs text-gray-500 mt-1">EDITOR</p>
             </div>
-            <!-- Status Label for Mobile -->
             <div id="status-label" class="text-emerald-500 font-bold text-xs md:text-sm md:mt-4 h-6"></div>
         </div>
 
@@ -106,7 +105,7 @@
                         </div>
                         <div>
                             <label class="block text-xs md:text-sm text-gray-400 mb-2">Pegar Texto/Fecha:</label>
-                            <input type="text" id="input-manual" placeholder="Ej: 24/07/2021..." class="w-full p-3 rounded-lg text-sm">
+                            <input type="text" id="input-manual" placeholder="Ej: 24/07/2021 o veinticuatro de julio..." class="w-full p-3 rounded-lg text-sm">
                         </div>
                     </div>
 
@@ -184,21 +183,17 @@
         const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
         const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
-        // Establecer fecha de hoy por defecto
-        document.getElementById('input-date').valueAsDate = new Date();
+        // BASE: Sin fecha inicial en el calendario (se deja vacío)
+        document.getElementById('input-date').value = "";
 
         // --- NAVEGACIÓN ---
         function showView(view) {
             document.getElementById('view-fechas').classList.toggle('hidden', view !== 'fechas');
             document.getElementById('view-texto').classList.toggle('hidden', view !== 'texto');
-            
             document.getElementById('btn-fechas').classList.toggle('active', view === 'fechas');
             document.getElementById('btn-fechas').classList.toggle('text-gray-400', view !== 'fechas');
-            
             document.getElementById('btn-texto').classList.toggle('active', view === 'texto');
             document.getElementById('btn-texto').classList.toggle('text-gray-400', view !== 'texto');
-            
-            // Auto scroll to top on mobile when switching views
             if (window.innerWidth < 768) {
                 document.querySelector('main').scrollTop = 0;
             }
@@ -211,11 +206,52 @@
                 const isSelected = (mode === 'low' && text.includes('min')) || 
                                  (mode === 'up' && text.includes('may')) || 
                                  (mode === 'title' && text.includes('propio'));
-                
                 btn.className = isSelected 
                     ? "case-btn flex-1 md:flex-none px-3 py-2 rounded-md bg-cyan-custom text-[10px] md:text-xs font-bold" 
                     : "case-btn flex-1 md:flex-none px-3 py-2 rounded-md bg-gray-800 border border-gray-600 text-[10px] md:text-xs";
             });
+        }
+
+        // --- LÓGICA DE PALABRAS A NÚMEROS (Inverso) ---
+        function palabrasANumero(str) {
+            if (!str) return null;
+            const dict = {
+                'un': 1, 'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5, 'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9, 'diez': 10,
+                'once': 11, 'doce': 12, 'trece': 13, 'catorce': 14, 'quince': 15, 'dieciséis': 16, 'diecisiete': 17, 'dieciocho': 18, 'diecinueve': 19,
+                'veinte': 20, 'veintiuno': 21, 'veintidós': 22, 'veintitrés': 23, 'veinticuatro': 24, 'veinticinco': 25, 'veintiséis': 26, 'veintisiete': 27, 'veintiocho': 28, 'veintinueve': 29,
+                'treinta': 30, 'cuarenta': 40, 'cincuenta': 50, 'sesenta': 60, 'setenta': 70, 'ochenta': 80, 'noventa': 90,
+                'cien': 100, 'ciento': 100, 'doscientos': 200, 'trescientos': 300, 'cuatrocientos': 400, 'quinientos': 500, 'seiscientos': 600, 'setecientos': 700, 'ochocientos': 800, 'novecientos': 900,
+                'mil': 1000, 'millon': 1000000
+            };
+            
+            // Limpieza básica y normalización
+            let cleanStr = str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            // Re-mapear el diccionario para ignorar tildes en la búsqueda
+            const normalizedDict = {};
+            for (let key in dict) {
+                let normalizedKey = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                normalizedDict[normalizedKey] = dict[key];
+            }
+
+            let parts = cleanStr.replace(/ y /g, ' ').split(/[\s-]+/);
+            let total = 0;
+            let current = 0;
+            
+            for (let p of parts) {
+                if (normalizedDict[p]) {
+                    let val = normalizedDict[p];
+                    if (val === 1000) {
+                        total += (current === 0 ? 1 : current) * 1000;
+                        current = 0;
+                    } else if (val === 1000000) {
+                        total += (current === 0 ? 1 : current) * 1000000;
+                        current = 0;
+                    } else {
+                        current += val;
+                    }
+                }
+            }
+            return total + current;
         }
 
         // --- LÓGICA DE NÚMEROS A LETRAS (Español) ---
@@ -229,19 +265,16 @@
             if (num < 10) return unidades[num];
             if (num < 20) return dieces[num - 10];
             if (num < 30) return num === 20 ? "veinte" : "veinti" + unidades[num % 10];
-            
             if (num < 100) {
                 let d = Math.floor(num / 10);
                 let u = num % 10;
                 return decenas[d] + (u > 0 ? " y " + unidades[u] : "");
             }
-
             if (num < 1000) {
                 let c = Math.floor(num / 100);
                 let resto = num % 100;
                 return (c === 1 && resto === 0) ? "cien" : centenas[c] + (resto > 0 ? " " + numeroALetras(resto) : "");
             }
-
             if (num < 1000000) {
                 let m = Math.floor(num / 1000);
                 let resto = num % 1000;
@@ -254,7 +287,6 @@
         function capitalizar(str) {
             if (currentCaseMode === 'up') return str.toUpperCase();
             if (currentCaseMode === 'low') return str.toLowerCase();
-            
             return str.toLowerCase().split(' ').map(word => {
                 if (['de', 'del', 'y', 'en'].includes(word)) return word;
                 return word.charAt(0).toUpperCase() + word.slice(1);
@@ -263,34 +295,64 @@
 
         // --- PROCESAMIENTO FECHAS ---
         function procesarFecha() {
-            let dt;
+            let dt = null;
             const manual = document.getElementById('input-manual').value.trim();
+            const calVal = document.getElementById('input-date').value;
             
             if (manual) {
-                const nums = manual.match(/\d+/g);
-                if (nums && nums.length >= 2) {
-                    let d = parseInt(nums[0]);
-                    let a = parseInt(nums[nums.length - 1]);
-                    if (a < 100) a += 2000;
-                    
-                    let m = document.getElementById('input-date').valueAsDate.getMonth();
-                    MESES.forEach((mes, i) => {
-                        if (manual.toLowerCase().includes(mes)) m = i;
-                    });
-                    dt = new Date(a, m, d);
+                const manualLower = manual.toLowerCase();
+                
+                // 1. Identificar el mes
+                let mesIndex = -1;
+                MESES.forEach((mes, i) => {
+                    if (manualLower.includes(mes)) mesIndex = i;
+                });
+
+                // 2. Extraer candidatos numéricos o textuales para Día y Año
+                const fragments = manualLower.split(/\bde\b/);
+                
+                let dia = null;
+                let año = null;
+
+                if (mesIndex !== -1 && fragments.length >= 2) {
+                    let diaFragment = fragments[0].trim();
+                    let añoFragment = fragments[fragments.length - 1].trim();
+
+                    // Intentar extraer número del fragmento de día
+                    let diaNumMatch = diaFragment.match(/\d+/);
+                    dia = diaNumMatch ? parseInt(diaNumMatch[0]) : palabrasANumero(diaFragment);
+
+                    // Intentar extraer número del fragmento de año
+                    let añoNumMatch = añoFragment.match(/\d+/);
+                    año = añoNumMatch ? parseInt(añoNumMatch[0]) : palabrasANumero(añoFragment);
                 } else {
-                    dt = document.getElementById('input-date').valueAsDate;
+                    const nums = manual.match(/\d+/g);
+                    if (nums && nums.length >= 3) {
+                        if (nums[0].length === 4) { // ISO
+                            año = parseInt(nums[0]); mesIndex = parseInt(nums[1]) - 1; dia = parseInt(nums[2]);
+                        } else { // Estandar
+                            dia = parseInt(nums[0]); mesIndex = parseInt(nums[1]) - 1; año = parseInt(nums[2]);
+                        }
+                    }
                 }
-            } else {
-                dt = document.getElementById('input-date').valueAsDate;
+
+                if (dia && mesIndex !== -1 && año) {
+                    if (año < 100) año += 2000;
+                    dt = new Date(año, mesIndex, dia);
+                }
+            } 
+            
+            // PRIORIDAD 2: Calendario (si manual falló o no existe)
+            if ((!dt || isNaN(dt.getTime())) && calVal) {
+                const parts = calVal.split('-');
+                dt = new Date(parts[0], parts[1]-1, parts[2]);
             }
 
-            if (!dt || isNaN(dt)) {
-                showStatus("Error en fecha", true);
+            if (!dt || isNaN(dt.getTime())) {
+                showStatus("Error: Ingrese una fecha válida", true);
+                document.getElementById('result-fecha').value = "";
                 return;
             }
-
-            dt = new Date(dt.getTime() + dt.getTimezoneOffset() * 60000);
 
             const d = dt.getDate();
             const m = dt.getMonth();
@@ -361,14 +423,12 @@
         function copyToClipboard(elementId) {
             const text = document.getElementById(elementId).value;
             if (!text) return;
-            
             const textArea = document.createElement("textarea");
             textArea.value = text;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            
             showStatus("✔ COPIADO");
         }
 
