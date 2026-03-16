@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataMorph Elite v9.0 | Ultimate Productivity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0F19;
+            color: #F9FAFB;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar { background-color: #111827; }
+        .main-container { background-color: #1F2937; }
+        .card { background-color: #111827; }
+        .accent-cyan { color: #22D3EE; }
+        .bg-cyan-custom { background-color: #06B6D4; }
+        .bg-cyan-custom:hover { background-color: #0891B2; }
+        
+        input, select, textarea {
+            background-color: #374151;
+            border: 1px solid #4B5563;
+            color: white;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #22D3EE;
+        }
+
+        .btn-nav.active {
+            background-color: #1F2937;
+            color: #22D3EE;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex">
+
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 flex flex-col border-r border-gray-800">
+        <div class="p-8 text-center">
+            <h1 class="text-2xl font-bold accent-cyan tracking-tighter">DATAMORPH</h1>
+            <p class="text-xs text-gray-500 mt-1">ELITE v9.0</p>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2">
+            <button onclick="showView('fechas')" id="btn-fechas" class="btn-nav active w-full flex items-center p-3 rounded-lg text-sm font-bold transition-all">
+                <i class="fa-solid fa-calendar-days mr-3"></i> MÓDULO FECHAS
+            </button>
+            <button onclick="showView('texto')" id="btn-texto" class="btn-nav w-full flex items-center p-3 text-gray-400 rounded-lg text-sm font-bold hover:bg-gray-800 transition-all">
+                <i class="fa-solid fa-file-lines mr-3"></i> PROCESADOR TEXTO
+            </button>
+        </nav>
+
+        <div id="status-label" class="p-6 text-center text-emerald-500 font-bold text-sm h-12"></div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto custom-scrollbar">
+        <div class="main-container h-full rounded-3xl p-8 shadow-2xl overflow-y-auto">
+            
+            <!-- VIEW: FECHAS -->
+            <div id="view-fechas">
+                <h2 class="text-3xl font-bold mb-6 text-center">Gestor Avanzado de Fechas</h2>
+                
+                <div class="card rounded-2xl p-6 mb-8 shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Calendario:</label>
+                            <input type="date" id="input-date" class="w-full p-3 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Pegar Texto/Fecha:</label>
+                            <input type="text" id="input-manual" placeholder="Ej: 24/07/2021..." class="w-full p-3 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-400 mb-2">Seleccione Formato:</label>
+                        <select id="select-format" class="w-full p-3 rounded-lg appearance-none cursor-pointer">
+                            <option value="notarial">Notarial (Letras con Números en Paréntesis)</option>
+                            <option value="largo">Largo (Veinticuatro de Julio de Dos Mil...)</option>
+                            <option value="dia_fecha">Día y Fecha (Sábado, 24 de Julio...)</option>
+                            <option value="administrativo">Administrativo (24-JUL-2021)</option>
+                            <option value="estandar">Estándar (24/07/2021)</option>
+                            <option value="iso">Técnico ISO (2021-07-24)</option>
+                            <option value="mes_ano">Solo Mes y Año (Julio de 2021)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-center space-x-2 mb-8">
+                        <button onclick="setCaseMode('low')" class="case-btn px-4 py-2 rounded-md bg-gray-800 border border-gray-600 text-sm">minúsculas</button>
+                        <button onclick="setCaseMode('up')" class="case-btn px-4 py-2 rounded-md bg-gray-800 border border-gray-600 text-sm">MAYÚSCULAS</button>
+                        <button onclick="setCaseMode('title')" class="case-btn px-4 py-2 rounded-md bg-cyan-custom text-sm font-bold">Nombre Propio</button>
+                    </div>
+
+                    <button onclick="procesarFecha()" class="w-full bg-cyan-custom text-white font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-95">
+                        GENERAR FECHA
+                    </button>
+                </div>
+
+                <div class="relative">
+                    <textarea id="result-fecha" readonly class="w-full h-32 rounded-2xl bg-gray-900 border-2 border-cyan-400 text-cyan-400 p-4 text-center text-2xl font-bold flex items-center justify-center resize-none"></textarea>
+                    <button onclick="copyToClipboard('result-fecha')" class="mt-4 mx-auto block bg-emerald-500 hover:bg-emerald-600 px-8 py-3 rounded-lg font-bold text-sm">
+                        COPIAR RESULTADO
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW: TEXTO -->
+            <div id="view-texto" class="hidden h-full flex flex-col">
+                <h2 class="text-3xl font-bold mb-6 text-center">Procesador Inteligente de Texto</h2>
+                
+                <div class="flex flex-1 gap-4 mb-6 min-h-[300px]">
+                    <textarea id="text-in" placeholder="Pegue su texto aquí..." class="flex-1 rounded-xl p-4 font-mono text-sm resize-none"></textarea>
+                    <textarea id="text-out" readonly placeholder="Resultado..." class="flex-1 rounded-xl p-4 font-mono text-sm text-cyan-400 bg-black/30 border-gray-700 resize-none"></textarea>
+                </div>
+
+                <div class="card rounded-2xl p-6">
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <input type="text" id="search-input" placeholder="Buscar..." class="flex-1 p-2 rounded-lg text-sm">
+                        <input type="text" id="replace-input" placeholder="Reemplazar por..." class="flex-1 p-2 rounded-lg text-sm">
+                        <button onclick="ejecutarReemplazo()" class="bg-cyan-700 hover:bg-cyan-600 px-4 py-2 rounded-lg text-xs font-bold">CAMBIAR TODO</button>
+                        <button onclick="borrarBusqueda()" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-xs font-bold">BORRAR</button>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <button onclick="modTxt('low')" class="bg-gray-700 px-4 py-2 rounded-lg text-xs">minúsculas</button>
+                        <button onclick="modTxt('up')" class="bg-gray-700 px-4 py-2 rounded-lg text-xs">MAYÚSCULAS</button>
+                        <button onclick="modTxt('title')" class="bg-emerald-600 px-4 py-2 rounded-lg text-xs font-bold">Nombre Propio</button>
+                        <button onclick="quitarSaltos()" class="bg-gray-600 px-4 py-2 rounded-lg text-xs">Quitar Saltos</button>
+                        <button onclick="copyToClipboard('text-out')" class="bg-cyan-500 px-4 py-2 rounded-lg text-xs font-bold">COPIAR TODO</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- ESTADO GLOBAL ---
+        let currentCaseMode = 'title';
+        const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+        const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+        // Establecer fecha de hoy por defecto
+        document.getElementById('input-date').valueAsDate = new Date();
+
+        // --- NAVEGACIÓN ---
+        function showView(view) {
+            document.getElementById('view-fechas').classList.toggle('hidden', view !== 'fechas');
+            document.getElementById('view-texto').classList.toggle('hidden', view !== 'texto');
+            
+            document.getElementById('btn-fechas').classList.toggle('active', view === 'fechas');
+            document.getElementById('btn-fechas').classList.toggle('text-gray-400', view !== 'fechas');
+            
+            document.getElementById('btn-texto').classList.toggle('active', view === 'texto');
+            document.getElementById('btn-texto').classList.toggle('text-gray-400', view !== 'texto');
+        }
+
+        function setCaseMode(mode) {
+            currentCaseMode = mode;
+            document.querySelectorAll('.case-btn').forEach(btn => {
+                const isSelected = btn.innerText.toLowerCase().includes(mode === 'low' ? 'min' : mode === 'up' ? 'may' : 'propio');
+                btn.className = isSelected 
+                    ? "case-btn px-4 py-2 rounded-md bg-cyan-custom text-sm font-bold" 
+                    : "case-btn px-4 py-2 rounded-md bg-gray-800 border border-gray-600 text-sm";
+            });
+        }
+
+        // --- LÓGICA DE NÚMEROS A LETRAS (Español) ---
+        function numeroALetras(num) {
+            const unidades = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+            const dieces = ['diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
+            const decenas = ['', '', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+            const centenas = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+
+            if (num === 100) return "cien";
+            if (num < 10) return unidades[num];
+            if (num < 20) return dieces[num - 10];
+            if (num < 30) return num === 20 ? "veinte" : "veinti" + unidades[num % 10];
+            
+            if (num < 100) {
+                let d = Math.floor(num / 10);
+                let u = num % 10;
+                return decenas[d] + (u > 0 ? " y " + unidades[u] : "");
+            }
+
+            if (num < 1000) {
+                let c = Math.floor(num / 100);
+                let resto = num % 100;
+                return centenas[c] + (resto > 0 ? " " + numeroALetras(resto) : "");
+            }
+
+            if (num < 1000000) {
+                let m = Math.floor(num / 1000);
+                let resto = num % 1000;
+                let milStr = m === 1 ? "mil" : numeroALetras(m) + " mil";
+                return milStr + (resto > 0 ? " " + numeroALetras(resto) : "");
+            }
+            return num.toString();
+        }
+
+        function capitalizar(str) {
+            if (currentCaseMode === 'up') return str.toUpperCase();
+            if (currentCaseMode === 'low') return str.toLowerCase();
+            
+            // Lógica para Nombre Propio (Title case inteligente)
+            return str.toLowerCase().split(' ').map(word => {
+                if (['de', 'del', 'y', 'en'].includes(word)) return word;
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        }
+
+        // --- PROCESAMIENTO FECHAS ---
+        function procesarFecha() {
+            let dt;
+            const manual = document.getElementById('input-manual').value.trim();
+            
+            if (manual) {
+                const nums = manual.match(/\d+/g);
+                if (nums && nums.length >= 2) {
+                    let d = parseInt(nums[0]);
+                    let a = parseInt(nums[nums.length - 1]);
+                    if (a < 100) a += 2000;
+                    
+                    // Intentar encontrar el mes por nombre
+                    let m = document.getElementById('input-date').valueAsDate.getMonth();
+                    MESES.forEach((mes, i) => {
+                        if (manual.toLowerCase().includes(mes)) m = i;
+                    });
+                    dt = new Date(a, m, d);
+                } else {
+                    dt = document.getElementById('input-date').valueAsDate;
+                }
+            } else {
+                dt = document.getElementById('input-date').valueAsDate;
+            }
+
+            if (!dt || isNaN(dt)) {
+                showStatus("Error en fecha", true);
+                return;
+            }
+
+            // Ajustar zona horaria local
+            dt = new Date(dt.getTime() + dt.getTimezoneOffset() * 60000);
+
+            const d = dt.getDate();
+            const m = dt.getMonth();
+            const a = dt.getFullYear();
+            const fmt = document.getElementById('select-format').value;
+            let res = "";
+
+            switch(fmt) {
+                case "notarial":
+                    res = `${numeroALetras(d)} (${d}) de ${MESES[m]} de ${numeroALetras(a)} (${a})`;
+                    break;
+                case "largo":
+                    res = `${numeroALetras(d)} de ${MESES[m]} de ${numeroALetras(a)}`;
+                    break;
+                case "dia_fecha":
+                    res = `${DIAS[dt.getDay()]}, ${d} de ${MESES[m]} de ${a}`;
+                    break;
+                case "administrativo":
+                    res = `${d.toString().padStart(2,'0')}-${MESES[m].substring(0,3).toUpperCase()}-${a}`;
+                    break;
+                case "estandar":
+                    res = `${d.toString().padStart(2,'0')}/${(m+1).toString().padStart(2,'0')}/${a}`;
+                    break;
+                case "iso":
+                    res = `${a}-${(m+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                    break;
+                case "mes_ano":
+                    res = `${MESES[m]} de ${a}`;
+                    break;
+            }
+
+            document.getElementById('result-fecha').value = capitalizar(res);
+        }
+
+        // --- LÓGICA TEXTO ---
+        function updateOut(txt) {
+            document.getElementById('text-out').value = txt;
+        }
+
+        function ejecutarReemplazo() {
+            const t = document.getElementById('text-in').value;
+            const b = document.getElementById('search-input').value;
+            const r = document.getElementById('replace-input').value;
+            if (b) updateOut(t.split(b).join(r));
+        }
+
+        function borrarBusqueda() {
+            const t = document.getElementById('text-in').value;
+            const b = document.getElementById('search-input').value;
+            if (b) updateOut(t.split(b).join(""));
+        }
+
+        function quitarSaltos() {
+            const t = document.getElementById('text-in').value;
+            updateOut(t.replace(/\n/g, " "));
+        }
+
+        function modTxt(m) {
+            const t = document.getElementById('text-in').value;
+            if (m === 'up') updateOut(t.toUpperCase());
+            else if (m === 'low') updateOut(t.toLowerCase());
+            else {
+                updateOut(t.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s*\w)/g, c => c.toUpperCase()));
+            }
+        }
+
+        // --- UTILIDADES ---
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).value;
+            if (!text) return;
+            
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            showStatus("✔ COPIADO");
+        }
+
+        function showStatus(msg, isError = false) {
+            const label = document.getElementById('status-label');
+            label.innerText = msg;
+            label.className = isError ? "p-6 text-center text-red-500 font-bold text-sm h-12" : "p-6 text-center text-emerald-500 font-bold text-sm h-12";
+            setTimeout(() => label.innerText = "", 2000);
+        }
+    </script>
+</body>
+</html>
